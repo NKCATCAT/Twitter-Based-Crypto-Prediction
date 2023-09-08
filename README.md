@@ -90,8 +90,8 @@ database_tosave = "popular_accounts_df"
 | `--resource_group`         | <resource_group_value>                                | str     |                                      |
 | `--ws_name`                | <workspace_value>                                     | str     |                                      |
 
-## 运行
 ### DualGCNbert/DualGCNbert/run.sh
+运行
 
 ## LightGBM
 ### dataset_for_classifier.py
