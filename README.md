@@ -30,3 +30,60 @@ sql_connector = "mysql+mysqlconnector://tangshuo:tangshuo@121.36.100.76:13310/ai
 database_tosave = "popular_accounts_df"
 #### STEP 4：爬取深度
 默认爬取深度为20
+
+## DualGCNbert
+### Active_Learning_Pytorch.py
+#### 模型参数
+##### Overall Parameters
+
+| Parameter                  | Default Value                                         | Type    | Description                          |
+|----------------------------|-------------------------------------------------------|---------|--------------------------------------|
+| `--iteration`              | 0                                                     | int     | Num of iteration 主动学习轮次         |
+| `--model_name`             | dualgcnbert                                           | str     | model class 选用模型                  |
+| `--dataset`                | twitter                                               | str     | dataset_files                        |
+| `--optimizer`              | adam                                                  | str     | optimizers                           |
+| `--initializer`            | xavier_uniform_                                       | str     | ...                                  |
+| `--num_epoch`              | 5                                                     | int     | ...                                  |
+| `--batch_size`             | 24                                                    | int     | ...                                  |
+| `--log_step`               | 20                                                    | int     | ...                                  |
+| `--polarities_dim`         | 3                                                     | int     | 情感极性种类                          |
+| `--device`                 | cuda                                                  | str     | cpu or cuda                          |
+| `--seed`                   | 1000                                                  | int     | ...                                  |
+| `--weight_decay`           | 0                                                     | int     | weight_decay if applied              |
+| `--loss_type`              | doubleloss                                            | str     | doubleloss, orthogonal, differentiated|
+| `--alpha`                  | 0.5                                                   | float   | ...                                  |
+| `--beta`                   | 0.9                                                   | float   | ...                                  |
+
+
+##### GCN Configuration
+
+| Parameter                  | Default Value                                         | Type    | Description                          |
+|----------------------------|-------------------------------------------------------|---------|--------------------------------------|
+| `--num_layers`             | 3                                                     | int     | Num of GCN layers.                   |
+| `--gcn_dropout`            | 0.1                                                   | float   | GCN layer dropout rate.              |
+| `--learning_rate`          | 0.001                                                 | float   | GCN lr                               |
+| `--attention_heads`        | 1                                                     | int     | multi-attention heads for SEMGCN     |
+| `--direct`                 | False                                                 |         | directed graph or undirected graph   |
+| `--hidden_dim`             | 768                                                   | int     | GCN dim 为hidden_dim的一半            |
+
+
+##### BERT Configuration
+
+| Parameter                  | Default Value                                         | Type    | Description                          |
+|----------------------------|-------------------------------------------------------|---------|--------------------------------------|
+| `--pretrained_bert_name`   | bert-base-uncased                                     | str     |                                      |
+| `--bert_dim`               | 768                                                   | int     |                                      |
+| `--bert_dropout`           | 0.3                                                   | float   | BERT dropout rate.                   |
+| `--adam_epsilon`           | 1e-6                                                  | float   | Epsilon for Adam optimizer.          |
+| `--diff_lr`                | False                                                 |         | if different lr is used              |
+| `--bert_lr`                | 2e-5                                                  | float   |                                      |
+
+##### Azure Labeling
+
+| Parameter                  | Default Value                                         | Type    | Description                          |
+|----------------------------|-------------------------------------------------------|---------|--------------------------------------|
+| `--connection_string`      | <connection_string_value>                             | str     |                                      |
+| `--ws_subscrip_id`         | <subscription_id_value>                               | str     |                                      |
+| `--container_name`         | <container_name_value>                                | str     |                                      |
+| `--resource_group`         | <resource_group_value>                                | str     |                                      |
+| `--ws_name`                | <workspace_value>                                     | str     |                                      |
