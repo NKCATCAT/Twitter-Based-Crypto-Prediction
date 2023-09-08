@@ -464,12 +464,10 @@ plot_win_rate(win_rate_dataset, files)
 
 predictions_records = get_model_predictions_records(results)
 #cases_data = merge_data_by_strategy_model(strategy_dataset, strategy_idx, model_idx, unique_coins)
-strategy_idx = 0 # 0 - 4 表示策略1，2，3，5，10 （第n次预测翻倍建仓）
-model_idx = 0 # 0 - 110 表示时间窗口5-60天，间隔半天
-cases_data = merge_data_by_predictions_records(predictions_records, model_idx, unique_coins)
 #%%
 market_data = get_market_data(unique_coins)
-model = [0, 20, 30, 50, 110]
+strategy_idx = 0 # 0 - 4 表示策略1，2，3，5，10 （第n次预测翻倍建仓）
+model = [0, 20, 30, 50, 110] # 0 - 110 表示时间窗口5-60天，间隔半天
 for model_idx in model:
     cases_data = merge_data_by_predictions_records(market_data,predictions_records, model_idx)
     plot_buy_and_sell(cases_data, n = 3)
