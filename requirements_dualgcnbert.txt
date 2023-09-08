@@ -6,6 +6,5 @@ transformers
 azure-storage-blob
 sqlalchemy
 nltk
-html
 langdetect
 jieba
