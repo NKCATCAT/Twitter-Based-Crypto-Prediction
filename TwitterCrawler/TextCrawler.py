@@ -339,11 +339,7 @@ def top_or_latest(driver, tab):
     return driver  
 #%%
 # Set Crawler Time Scope
-def time_scope(i):
-    start_date = datetime(2023,7,24)
-    end_date = datetime.now()
-    
-    days_per_call = 100
+def time_scope(i, start_date, end_date, days_per_call):
     extra_day = 1 if i > 1 else 0
     current_date = min(start_date + timedelta((i-1) * days_per_call) + timedelta(extra_day), end_date)
     call_end_date = min(current_date + timedelta(days_per_call), end_date)
@@ -587,7 +583,7 @@ def get_dataframe(page_sources_1, page_sources_2):
     return tweets_df
 #%%
 # avoid error
-def login_and_check_account(account,query,tab,counts):
+def login_and_check_account(account,query,tab,counts, start_date, end_date, days_per_call):
     email_, username, password, email_password = account
     try:
         driver = twitter_login(email_, username, password, email_password, None, None, None, None)
@@ -600,7 +596,7 @@ def login_and_check_account(account,query,tab,counts):
         time.sleep(3)
         counts += 1
         try:
-            f_m, f_d, f_y, t_m, t_d, t_y = time_scope(counts)
+            f_m, f_d, f_y, t_m, t_d, t_y = time_scope(counts, start_date, end_date, days_per_call)
             advanced_search(query, driver, f_m, f_d, f_y, t_m, t_d, t_y)
         except:
             counts -= 1
@@ -613,7 +609,7 @@ def login_and_check_account(account,query,tab,counts):
             pass
         return None, counts
 #%%
-def get_twitter_page(account_filepath, all_accounts, tab, i,sql_connector,database_tosave, proxy_username = None, proxy_passwords = None, proxy_ip = None, proxy_port = None):
+def get_twitter_page(account_filepath, all_accounts, tab, i,sql_connector,database_tosave,start_date, end_date, days_per_call, proxy_username = None, proxy_passwords = None, proxy_ip = None, proxy_port = None):
     page_sources_1 = [] #用来存储不包含show_more的源代码
     page_sources_2 = [] #用来存储包含show_more的源代码
     used_accounts = []
@@ -631,12 +627,12 @@ def get_twitter_page(account_filepath, all_accounts, tab, i,sql_connector,databa
         counts = 0
         for k in range(i):
             account = next(accounts)
-            driver, counts = login_and_check_account(account,query,tab,counts)
+            driver, counts = login_and_check_account(account,query,tab,counts,start_date, end_date, days_per_call)
             print(driver)
             while driver is None:
                 used_accounts.append(account)
                 account = next(accounts)
-                driver,counts = login_and_check_account(account,query,tab,counts)
+                driver,counts = login_and_check_account(account,query,tab,counts,start_date, end_date, days_per_call)
             used_accounts.append(account)
             counts_for_queries += 1
 
@@ -711,7 +707,10 @@ def get_twitter_page(account_filepath, all_accounts, tab, i,sql_connector,databa
 account_filepath = r"./all_accounts"
 kol_filepath = r"./kol_list.pickle" 
 tab = "Latest"
-i = 1 # 用多少账号来爬取一次的内容
+start_date = datetime(2023, 7, 24) #爬取推文的起始时间
+end_date = datetime.now() #爬取推文的结束时间
+days_per_call = 100 #一个账户所爬推文的时间跨度
+i = 1 # 用多少账号来爬取一个账户推文内容
 sql_connector = "mysql+mysqlconnector://tangshuo:tangshuo@121.36.100.76:13310/ai_summer"
 database_tosave = "tweets_df_final"
 # get twitter accounts
@@ -723,4 +722,4 @@ with open(kol_filepath, "rb") as f:
     queries = pickle.load(f)
 queries.reverse()
 #%%
-get_twitter_page(account_filepath, all_accounts, tab, i, sql_connector,database_tosave)   
+get_twitter_page(account_filepath, all_accounts, tab, i, sql_connector,database_tosave,start_date, end_date, days_per_call)   
