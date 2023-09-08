@@ -59,12 +59,13 @@ database_tosave = "popular_accounts_df"
 
 | Parameter                  | Default Value                                         | Type    | Description                          |
 |----------------------------|-------------------------------------------------------|---------|--------------------------------------|
-| `--num_layers`             | 3                                                     | int     | Num of GCN layers.                   |
+| `--num_layers`             | 2                                                     | int     | Num of GCN layers.                   |
 | `--gcn_dropout`            | 0.1                                                   | float   | GCN layer dropout rate.              |
 | `--learning_rate`          | 0.001                                                 | float   | GCN lr                               |
 | `--attention_heads`        | 1                                                     | int     | multi-attention heads for SEMGCN     |
 | `--direct`                 | False                                                 |         | directed graph or undirected graph   |
 | `--hidden_dim`             | 768                                                   | int     | GCN dim 为hidden_dim的一半            |
+| `--parseadj`               | True                                                  |         | dependency probability               |
 
 
 ##### BERT Configuration
@@ -77,6 +78,7 @@ database_tosave = "popular_accounts_df"
 | `--adam_epsilon`           | 1e-6                                                  | float   | Epsilon for Adam optimizer.          |
 | `--diff_lr`                | False                                                 |         | if different lr is used              |
 | `--bert_lr`                | 2e-5                                                  | float   |                                      |
+| `--max_length`             | 150                                                   | int     |max sequence length                   |
 
 ##### Azure Labeling
 
