@@ -89,3 +89,27 @@ database_tosave = "popular_accounts_df"
 | `--container_name`         | <container_name_value>                                | str     |                                      |
 | `--resource_group`         | <resource_group_value>                                | str     |                                      |
 | `--ws_name`                | <workspace_value>                                     | str     |                                      |
+
+## 运行
+### DualGCNbert/DualGCNbert/run.sh
+
+## LightGBM
+### dataset_for_classifier.py
+#### STEP 1: 获取行情
+sql_connector = "mysql+mysqlconnector://tangshuo:tangshuo@121.36.100.76:13310/ai_summer"
+#### STEP 2：设定异动
+abnormal_threshold = 0.1
+#### STEP 3: 选择多特征或单特征
+multi_type = "multi"  
+multi_type = "non_multi"
+
+### train_test_plot.py
+#### STEP 1: 选择多特征或者单特征以及异动
+filepath = r"./dataset/en/"  
+features_type = "multi/"  
+threshold = "0.1"  
+#### STEP 2：选择训练币种比例
+testing_pct = 0.5
+#### STEP 3: 选择策略并画图
+strategy_idx = 0  # 0 - 4 表示策略1，2，3，5，10 （第n次预测翻倍建仓）  
+model = [0, 20, 30, 50, 110] # 0 - 110 表示时间窗口5-60天，间隔半天
