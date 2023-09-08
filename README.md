@@ -26,7 +26,7 @@ start_point = "CryptoZhaoX"
 #### STEP 2: 获取爬大V用的账号
 文件 all_accounts 
 #### STEP 3: 存储
-sql_connector = "mysql+mysqlconnector://tangshuo:tangshuo@121.36.100.76:13310/ai_summer"
+sql_connector = "mysql+mysqlconnector://tangshuo:tangshuo@121.36.100.76:13310/ai_summer"  
 database_tosave = "popular_accounts_df"
 #### STEP 4：爬取深度
 默认爬取深度为20
