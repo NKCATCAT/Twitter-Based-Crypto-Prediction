@@ -610,11 +610,11 @@ def main():
     parser.add_argument('--bert_lr', default=2e-5, type=float)
     
     #Azure Labeling
-    parser.add_argument('--connection_string', default = 'DefaultEndpointsProtocol=https;AccountName=tweetssentimen1178258461;AccountKey=ryHKU3NjkYQXxJJWgom1KMFHkMWHI/oN0OEdzUSw7zqD47COgQFKt6YujKI+ChCzDsKaDkFYGPYc+AStagey6g==;EndpointSuffix=core.windows.net', type = str)
-    parser.add_argument('--ws_subscrip_id', default = '3a374fb2-85f3-4e7b-8f1e-986a169d9972', type = str)
-    parser.add_argument('--container_name', default= 'azureml-blobstore-875d9705-5817-4dea-9338-9bd0dd075949', type = str)
-    parser.add_argument('--resource_group', default= 'Tweets-Labeling', type = str)
-    parser.add_argument('--ws_name', default = 'Tweets-Sentiment-Labeling', type = str)
+    parser.add_argument('--connection_string', default = 'your_connection_string', type = str)
+    parser.add_argument('--ws_subscrip_id', default = 'your_ws_subscrip_id', type = str)
+    parser.add_argument('--container_name', default= 'your_container_name', type = str)
+    parser.add_argument('--resource_group', default= 'your_resource_group', type = str)
+    parser.add_argument('--ws_name', default = 'your_ws_name', type = str)
     opt = parser.parse_args()
     	
     opt.model_class = model_classes[opt.model_name]
