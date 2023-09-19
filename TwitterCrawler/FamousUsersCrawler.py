@@ -398,7 +398,7 @@ def save_to_database(popular_names, popular_followers, popular_followings):
 #%%
 start_point = "CryptoZhaoX"     
 account_filepath = r"./all_accounts"
-sql_connector = "mysql+mysqlconnector://tangshuo:tangshuo@121.36.100.76:13310/ai_summer"
+sql_connector = "your_database"
 database_tosave = "popular_accounts_df"
 with open(account_filepath, 'rb') as f:
     all_accounts = pickle.load(f)
