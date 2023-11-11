@@ -513,33 +513,22 @@ class Instructor:
         criterion = nn.CrossEntropyLoss()
         best_acc, best_f1 = self._train(criterion, opt)
         logger.info(f': best_acc:{best_acc}, best_f1: {best_f1}')
-        while True:
-            user_input = input("Iteration Completed, check the best model and enter 'predict' to predict unlabeled data:")
-            if user_input == 'predict':
-                while True:
-                    is_used_model = input("Enter 'yes' to use new model to predict when active learning is used. Otherwise, enter 'no'")
-                    if is_used_model == 'yes':
-                        iteration = input("Enter best model iteration: ")
-                        fold = input("Enter best model fold: ")
-                    elif is_used_model == 'no':
-                        iteration = input("Enter best model iteration: ")
-                        fold = input("Enter best model fold: ")
-                        best_acc = float(input("Enter best model acc: "))
-                        best_f1 = float(input("Enter best model f1: "))
-                    best_model_path = "../DualGCNbert/state_dict/en/dualgcnbert_twitter_acc_{:.4f}_f1_{:.4f}_iteration{}_fold{}".format(best_acc, best_f1, iteration, fold)
-                    if os.path.exists(best_model_path):
-                        self.model.load_state_dict(torch.load(best_model_path))
-                        logger.info(f"Best Model Path is loaded {best_model_path}")
-                        data_with_labeled = self.predict_labels(self.unlabeled_dataloader)
-                        logger.info('Finished Predicting Unlabeled Data')
-                        with open("../dataset/labeled/en.pkl", 'wb') as f:
-                            pickle.dump(data_with_labeled, f)
-                        break
-                    else:
-                        print("invalid model path!")
-                break
-            else:
-                print("invalid input!")
+        iteration = "1"
+        fold = "1"
+        best_acc = 0.7839
+        best_f1 = 0.7802
+
+        best_model_path = f"../DualGCNbert/state_dict/en/dualgcnbert_twitter_acc_{best_acc:.4f}_f1_{best_f1:.4f}_iteration{iteration}_fold{fold}"
+
+        if os.path.exists(best_model_path):
+            self.model.load_state_dict(torch.load(best_model_path))
+            logger.info(f"Best Model Path is loaded {best_model_path}")
+            data_with_labeled = self.predict_labels(self.unlabeled_dataloader)
+            logger.info('Finished Predicting Unlabeled Data')
+            with open("../dataset/labeled/en.pkl", 'wb') as f:
+                pickle.dump(data_with_labeled, f)
+        else:
+            print("Invalid model path!")
 def main():
     model_classes = {
         'dualgcnbert': DualGCNBertClassifier,

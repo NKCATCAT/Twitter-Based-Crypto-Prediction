@@ -5,7 +5,7 @@ Created on Mon Jul 24 10:04:53 2023
 @author: 86189
 """
 
-import json
+import pickle
 import numpy as np
 from tqdm import tqdm
 from transformers import BertTokenizer
@@ -16,9 +16,9 @@ sys.path.append('../LAL_Parser/src_joint')
 #%%
 def ParseData(data_path):
     initial = 'initial' in data_path
-    with open(data_path) as infile:
+    with open(data_path, 'rb') as infile:
         all_data = []
-        data = json.load(infile)
+        data = pickle.load(infile)
         j = 0
         for _, d in enumerate(data):
             # different handling of sentence_id for 'initial' and others

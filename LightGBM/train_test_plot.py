@@ -1,3 +1,4 @@
+#%%
 # -*- coding: utf-8 -*-
 """
 Created on Thu Aug 31 12:52:18 2023
@@ -21,7 +22,7 @@ np.random.seed(42)
 #%%
 # lightgbm training and test and evaluation metrics
 def train_and_test(train_data, val_data, x_val,y_val,coin_names_val,growth_rates, double_date, price, double_price,
-                   current_date,features):
+                   current_date,number):
     params = {
         'objective': 'binary',
         'boosting_type': 'gbdt',
@@ -38,6 +39,7 @@ def train_and_test(train_data, val_data, x_val,y_val,coin_names_val,growth_rates
     # 训练轮数
     num_round = 100
     bst = lgb.train(params, train_data, num_round,valid_sets = [val_data])
+    bst.save_model(f'model_{number}.txt')
     # 进行预测
     y_pred_prob = bst.predict(x_val)
     y_pred = [1 if prob > 0.5 else 0 for prob in y_pred_prob]
@@ -112,7 +114,8 @@ def get_lightgbm_results(filepath, features_type, testing_pct,threshold):
     folder = os.listdir(filepath+features_type+threshold)
     folder = sorted(folder,key = extract_number)
     for datapath in folder:
-        with open(datapath, 'rb') as f:
+        print(filepath+features_type+threshold+ datapath)
+        with open(filepath+features_type+threshold+ datapath, 'rb') as f:
             tweets = pickle.load(f)
         match = re.search(r'(\d+\.\d+)days', datapath)
         if match:
@@ -142,7 +145,8 @@ def get_lightgbm_results(filepath, features_type, testing_pct,threshold):
         y_train = tweets[~val_mask][target]
         train_data = lgb.Dataset(X_train, label=y_train)
         val_data = lgb.Dataset(X_val, label=y_val, reference=train_data)
-        metrics = train_and_test(train_data, val_data, X_val, y_val, coin_names_val,growth_rates,double_date, price, double_price,current_date,features)
+        metrics = train_and_test(train_data, val_data, X_val, y_val, coin_names_val,growth_rates,double_date, price, double_price,
+                                 current_date, number)
         results.append(metrics)
     return results, unique_coins
 #%%
@@ -452,10 +456,11 @@ def get_market_data(unique_coins):
 #%%
 filepath = r"./dataset/en/"
 features_type = "multi/"
-threshold = "0.1"
+threshold = "10%/"
 testing_pct = 0.5
 
 results, unique_coins= get_lightgbm_results(filepath, features_type, testing_pct, threshold)
+#%%
 win_rate_dataset, _ = get_win_rates_and_cases(results)
 
 files = sort_files(filepath, features_type)
