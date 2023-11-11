@@ -1,6 +1,23 @@
 # Twitter-Based-Crypto-Prediction
 ## ProjectURL
 https://drive.google.com/file/d/1svsLf5vR76WKC0GlBYgnSUDxGBZZEvrR/view?usp=sharing
+## Summary
+As a Quantitative Research Intern at Venus Quant, I spearheaded a project focused on analyzing and predicting cryptocurrency market movements using sentiment analysis and machine learning. Key achievements included:
+### Data Collection: 
+Developed a Selenium-based web crawler, gathering over 710,000 tweets from Crypto KOLs for sentiment analysis.
+
+### Model Development: 
+Replicated and enhanced the DualGCN-BERT model for sentiment analysis, integrating advanced NLP techniques and implementing regularizers to optimize performance.
+
+### Active Learning: 
+Fine-tuned the model using an active learning approach, achieving an 80.3% F1 macro score in sentiment prediction.
+
+### Market Prediction: 
+Developed a LightGBM-based prediction model using time-decay adjusted features, achieving over 43% win rate in predicting price doubling events.
+
+### Real-Time Deployment: 
+Implemented a real-time monitoring system for tweets, ERC-20 tokens, and price updates, along with a proactive module for operational alerts.
+### This project effectively combined NLP, machine learning, and real-time data analysis to provide insights into cryptocurrency market trends.
 ## DualGCNbert
 ### Active_Learning_Pytorch.py
 #### Model Parameters
