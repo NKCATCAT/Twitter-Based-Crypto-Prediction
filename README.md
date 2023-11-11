@@ -79,3 +79,5 @@ Implemented a real-time monitoring system for tweets, ERC-20 tokens, and price u
 
 ### DualGCNbert/DualGCNbert/run.sh
 
+## Results
+![Results](example_results.png)
