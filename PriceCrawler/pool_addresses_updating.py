@@ -124,7 +124,7 @@ def worker(network, multi_contract_addresses, api_url, sql_connector, database_t
             if pool_info:
                 pool_info_storage(pool_info, sql_connector, network, chunk, database_tosave)
 #%%
-sql_connector = "mysql+mysqlconnector://tangshuo:tangshuo@121.36.100.76:13310/ai_summer"    
+sql_connector = "your_database"    
 networks = ["eth","arbitrum","base"]
 api_url = "https://api.geckoterminal.com/api/v2"
 database_tosave = "token_pool_addresses"

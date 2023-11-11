@@ -120,7 +120,7 @@ def ohlcv_info_storage(ohlcv_info, sql_connector, name, symbol, network, pool_id
         except:
             pass
 #%%
-sql_connector = "mysql+mysqlconnector://tangshuo:tangshuo@121.36.100.76:13310/ai_summer"
+sql_connector = "your_database"
 api_url = "https://api.geckoterminal.com/api/v2"
 database_tosave = "erc20_token_price_real_time"
 pool_database = "token_pool_addresses"

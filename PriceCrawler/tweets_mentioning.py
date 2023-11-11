@@ -101,6 +101,6 @@ def add_new_tokens_to_stats(sql_connector):
 
     engine.dispose()
 #%%
-sql_connector = "mysql+mysqlconnector://tangshuo:tangshuo@121.36.100.76:13310/ai_summer" 
+sql_connector = "your_database" 
 add_new_tokens_to_stats(sql_connector)
 update_unmentioned_days(sql_connector)
