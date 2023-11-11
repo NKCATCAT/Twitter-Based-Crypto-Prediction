@@ -22,7 +22,7 @@ from sqlalchemy import create_engine
 import pandas as pd
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from collections import deque
+from collections import deque,Counter
 #%%
 def get_mail_verified(username, password):
 
@@ -90,7 +90,7 @@ def twitter_login(email, username, password, email_password, proxy_username, pro
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--ignore-certificate-errors")
-    
+    chrome_options.add_argument("--headless=new")
     # If ip proxy is used
     '''
     proxy_dict = {
@@ -100,142 +100,146 @@ def twitter_login(email, username, password, email_password, proxy_username, pro
     }
     }
     '''
-    webdriver_service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=webdriver_service, options=chrome_options)
-    driver.get('https://twitter.com/login')
-    
+    webdriver_service = Service('./chromedriver-linux64/chromedriver')
+    webdriver_service.log_path = './chromedriver.log'  # 设置日志路径
+    driver = webdriver.Chrome(service = webdriver_service, options=chrome_options)
+    #webdriver_service = Service(ChromeDriverManager().install())
+    #driver = webdriver.Chrome(service=webdriver_service, options=chrome_options)
+    driver.get('https://twitter.com/i/flow/login')
+    print(driver.title)
     time.sleep(7.5)
+    # Error
+    xpath_expr_1 = (
+    '//span[text()="出错了，但别担心，这不是你的错"] | '
+    '//span[text()="Something went wrong, but don’t fret — let’s give it another shot."] | '
+    '//span[text()="出错了，请重试"] | '
+    '//span[text()="Something went wrong. Try reloading."]'
+    )
     try:
-        login_error = driver.find_element(By.XPATH, '//span[text()="出错了，但别担心，这不是你的错"]')
-        if login_error is None:
-            login_error = driver.find_element(By.XPATH, '//span[text()="Something went wrong, but don’t fret — let’s give it another shot."]')
-            if login_error:
-                login_error.click()
-                time.sleep(3)
-                driver.refresh()
-    except NoSuchElementException:
-        try:
-            login_error = driver.find_element(By.XPATH, '//span[text()="出错了，但别担心，这不是你的错"]')
-            if login_error is None:
-                login_error = driver.find_element(By.XPATH, '//span[text()="Something went wrong, but don’t fret — let’s give it another shot."]')
-                if login_error:
-                    login_error.click()
-                    time.sleep(3)
-                    driver.refresh()
-        except:
-            pass
-    time.sleep(5)
-    try:
-        login_error = driver.find_element(By.XPATH, '//span[text()="出错了，请重试"]')
+        login_error = driver.find_element(By.XPATH, xpath_expr_1)
         if login_error:
             login_error.click()
-            login_error = driver.find_element(By.XPATH, '//span[text()="出错了，请重试"]')
-            if login_error:
-                login_error.click()
+            time.sleep(3)
     except NoSuchElementException:
-        try:
-            login_error = driver.find_element(By.XPATH, '//span[text()="出错了，请重试"]')
-            if login_error:
-                login_error.click()
-                login_error = driver.find_element(By.XPATH, '//span[text()="出错了，请重试"]')
-                if login_error:
-                    login_error.click()
-        except:
-            pass
+        pass
+    time.sleep(5)
+
     # Login email
+    xpath_expr_2 = (
+    '//span[text()="下一步"] | '
+    '//span[text()="Next"]'
+    )
     try:
         username_field = driver.find_element(By.NAME, "text")
         username_field.send_keys(email)
-        next_button = driver.find_element(By.XPATH, '//span[text()="下一步"]')
+        next_button = driver.find_element(By.XPATH, xpath_expr_2)
         next_button.click()
+    
     except NoSuchElementException:
-        driver.refresh()
         time.sleep(10)
         try:
             username_field = driver.find_element(By.NAME, "text")
             username_field.send_keys(email)
-            next_button = driver.find_element(By.XPATH, '//span[text()="下一步"]')
+            next_button = driver.find_element(By.XPATH, xpath_expr_2)
             next_button.click()
         except NoSuchElementException:
             time.sleep(15)
             username_field = driver.find_element(By.NAME, "text")
             username_field.send_keys(email)
-            next_button = driver.find_element(By.XPATH, '//span[text()="下一步"]')
+            next_button = driver.find_element(By.XPATH, xpath_expr_2)
             next_button.click()
+    print("Enter Email")
+    time.sleep(5)
+    
     # Login username
-    time.sleep(5)
-    try:
-        error_message = driver.find_element(By.XPATH, '//span[text()="输入你的手机号码或用户名"]')
-        if error_message:
-            try:
-                new_username_field = driver.find_element(By.NAME, 'text')
-                new_username_field.send_keys(username)
-                next_button = driver.find_element(By.XPATH, '//span[text()="下一步"]')
-                next_button.click()
-            except NoSuchElementException:
-                time.sleep(10)
-                try:
-                    new_username_field = driver.find_element(By.NAME, 'text')
-                    new_username_field.send_keys(username)
-                    next_button = driver.find_element(By.XPATH, '//span[text()="下一步"]')
-                    next_button.click()
-                except NoSuchElementException:
-                    time.sleep(20)
-                    new_username_field = driver.find_element(By.NAME, 'text')
-                    new_username_field.send_keys(username)
-                    next_button = driver.find_element(By.XPATH, '//span[text()="下一步"]')
-                    next_button.click()       
-    except NoSuchElementException:
-        pass
-    # Login password
-    time.sleep(5)
-    try:
-        password_field = driver.find_element(By.NAME, "password")
-        password_field.send_keys(password)
-        next_button = driver.find_element(By.XPATH, '//span[text() = "登录"]')
+    xpath_expr_3 = (
+    '//span[text()="输入你的手机号码或用户名"] |'
+    '//span[text()="Enter your phone number or username"] |'
+    '//span[text()="Phone or username"]'
+    )
+    retry = 0
+    max_retry = 3
+    error_message = None
+    while retry <= max_retry:
+        try:
+            error_message = driver.find_element(By.XPATH, xpath_expr_3)
+            break
+        except:
+            time.sleep(5)
+            retry += 1
+    if error_message:
+        new_username_field = driver.find_element(By.NAME, 'text')
+        new_username_field.send_keys(username)
+        next_button = driver.find_element(By.XPATH, xpath_expr_2)
         next_button.click()
-    except NoSuchElementException:
-        time.sleep(10)
+        print("Enter username")
+    time.sleep(5)
+
+    # Login password
+    xpath_expr_4 = (
+    '//span[text()="登录"] |'
+    '//span[text()="Log in"]')
+    retry = 0
+    max_retry = 3
+    while retry <= max_retry:
         try:
             password_field = driver.find_element(By.NAME, "password")
             password_field.send_keys(password)
-            next_button = driver.find_element(By.XPATH, '//span[text() = "登录"]')
+            next_button = driver.find_element(By.XPATH, xpath_expr_4)
             next_button.click()
+            break
         except NoSuchElementException:
-            time.sleep(15)
-            password_field = driver.find_element(By.NAME, "password")
-            password_field.send_keys(password)
-            next_button = driver.find_element(By.XPATH, '//span[text() = "登录"]')
-            next_button.click()
-    # If email is inspected 
+            time.sleep(5)
+            retry += 1
+    print("Enter password")
     time.sleep(5)
+
+    # If email is inspected
+    xpath_expr_5 = (
+    '//span[text()="检查你的邮箱"] | '
+    '//span[text()="Confirm your email address"] |'
+    '//span[text()="Check your email"] |'
+    '//span[contains(text(),"a confirmation code")]')
     try:
-        error_message = driver.find_element(By.XPATH, '//span[text()="检查你的邮箱"]')
+        error_message = driver.find_element(By.XPATH, xpath_expr_5)
         if error_message:
             time.sleep(10)
             new_email_field = driver.find_element(By.NAME, 'text')
             verified_code = get_mail_verified(email, email_password)
             if verified_code is None:
+                try:
+                    driver.quit()
+                except:
+                    pass
                 driver = None
             else:
                 new_email_field.send_keys(verified_code)
-                next_button = driver.find_element(By.XPATH, '//span[text()="下一步"]')
+                next_button = driver.find_element(By.XPATH, xpath_expr_2)
                 next_button.click()
     except NoSuchElementException:
         pass
     except TimeoutException:
+        try:
+            driver.quit()
+        except:
+            pass
         driver = None
+
     # If Extra Authentication is needed, try next account.
     time.sleep(3)
     try:
         heading1 = driver.find_element(By.XPATH, '//h2[contains(text(),"Authenticate your account")]')
         heading2 = driver.find_element(By.XPATH, "//button[contains(text(), 'Authenticate')]")
         if heading1 or heading2:
+            try:
+                driver.quit()
+            except:
+                pass
             driver = None
     except:
         pass
     time.sleep(5)
-    return driver   
+    return driver
 #%%
 # convert text to number for views, retweets, replies, likes
 def convert_to_int(input_string):
@@ -253,17 +257,20 @@ def convert_to_int(input_string):
 #%%
 # check if the user has followers >= 10000, following > 0
 def check_popularity(driver, following_name):
-    following_name = following_name.replace("@", "")
-    url = f'https://twitter.com/{following_name}'
-    driver.get(url)
-    if "These tweets are protected" in driver.page_source:
+    try:
+        following_name = following_name.replace("@", "")
+        url = f'https://twitter.com/{following_name}'
+        driver.get(url)
+        if "These tweets are protected" in driver.page_source:
+            return "next"
+        if "Something went wrong. Try reloading." in driver.page_source:
+            return "next"
+    except:
         return "next"
-    if "Something went wrong. Try reloading." in driver.page_source:
-        return "next account"
     try:
         search_error = driver.find_element(By.CSS_SELECTOR, '.css-901oao css-16my406 r-poiln3 r-bcqeeo r-qvutc0')
         if search_error.text == 'Something went wrong. Try reloading.':
-            return "next account"
+            return "next"
     except:
         pass
         
@@ -271,7 +278,7 @@ def check_popularity(driver, following_name):
         wait = WebDriverWait(driver, 15)  # 例如，最大等待时间为15秒
         
         # 等待followers元素出现
-        followers = wait.until(EC.presence_of_element_located((By.XPATH, f'//a[@href="/{following_name}/followers" and @role= "link"]//span[contains(translate(text(), "0123456789", ""),text())]')))
+        followers = wait.until(EC.presence_of_element_located((By.XPATH, f'//a[@href="/{following_name}/verified_followers" and @role= "link"]//span[contains(translate(text(), "0123456789", ""),text())]')))
         num_followers = convert_to_int(followers.text)
         
         # 等待followings元素出现
@@ -299,50 +306,83 @@ def parse_page_sources(page_sources):
                 following_names.append(names.text)
     return list(set(following_names))
 #%%
-def get_starting_point_followings(driver, start_point):
-    page_sources = []
-    driver.get(f'https://twitter.com/{start_point}/following') 
-    time.sleep(7.5) #等待页面加载
-    driver.maximize_window()
-    previous_page_source = driver.page_source
-    page_sources.append(previous_page_source)
-    while True:
-        actions = ActionChains(driver)
-        actions.send_keys(Keys.PAGE_DOWN)
-        actions.perform()
-        
-        time.sleep(3)
-            
-        current_page_source = driver.page_source # 获取当前页面的源码或内容
-        
-        # 比较前后两次页面源码或内容
-        if current_page_source == previous_page_source:
-            # 没有新内容加载，说明滑动到了页面底部，停止滑动
-            break
-        page_sources.append(current_page_source)
-        previous_page_source = current_page_source
-    following_names = parse_page_sources(page_sources)
-    return following_names
+def get_starting_point_followings_verified_followers(driver, start_point):
+    def collect_page_sources(driver):
+        page_sources = []
+        previous_page_source = driver.page_source
+        page_sources.append(previous_page_source)
+        while True:
+            actions = ActionChains(driver)
+            actions.send_keys(Keys.PAGE_DOWN)
+            actions.perform()
+            time.sleep(3)
+            current_page_source = driver.page_source # 获取当前页面的源码或内容
+            # 比较前后两次页面源码或内容
+            if current_page_source == previous_page_source:
+                # 没有新内容加载，说明滑动到了页面底部，停止滑动
+                break
+            page_sources.append(current_page_source)
+            previous_page_source = current_page_source
+        driver.back()
+        return page_sources
+    try:
+        driver.get(f'https://twitter.com/{start_point}/following') 
+        time.sleep(7.5) #等待页面加载
+        driver.maximize_window()
+        if "Something went wrong. Try reloading." in driver.page_source:
+            return "next"
+        page_sources_following = collect_page_sources(driver)
+        driver.get(f'https://twitter.com/{start_point}/verified_followers') 
+        page_sources_followers = collect_page_sources(driver)
+        following_names = parse_page_sources(page_sources_following)
+        followers_names = parse_page_sources(page_sources_followers)
+        split_users = followers_names + following_names
+        return list(set(split_users))
+    except:
+        return "next"
 #%%
 def login_and_check_account(account):
     email_, username, password, email_password = account
     try:
         driver = twitter_login(email_, username, password, email_password, None, None, None, None)
+        if driver:
+            driver.maximize_window()
+        time.sleep(6)
         return driver
     except:
         try:
-            driver.close()
+           driver.quit()
         except:
             pass
         return None
 #%%
-def process_account(driver, accounts, start_point,sql_connector, database_tosave):
+def find_common_users(driver,split_map,threshold = 3):
+    kols_followings = []
+    kols_followers = []
+    kols = []
+    all_users = [item for sublist in split_map.values() for item in sublist]
+    counter = Counter(all_users)
+    filtered_users = [key.replace("@","") for key,value in counter.items() if value >= threshold]
+    for user in filtered_users:
+        popular = check_popularity(driver, user)
+        if popular and popular != "next":
+            following_name, num_followers, num_followings = popular
+            kols.append(following_name)
+            kols_followings.append(num_followings)
+            kols_followers.append(num_followers)
+    data = {
+    'username': kols,
+    'followers': kols_followers,
+    'following': kols_followings
+    }
+    return kols,pd.DataFrame(data)
+#%%
+def process_account(driver, accounts, start_point):
     visited = set()
     queue = deque([(start_point, 0)])
+    split_map = {}
     max_depth = 20
-    popular_names = []
-    popular_followers = []
-    popular_followings = []
+    filtered_users = None
     i = 0
     while queue:
         following_name, depth = queue.popleft()
@@ -361,7 +401,7 @@ def process_account(driver, accounts, start_point,sql_connector, database_tosave
                 account = next(accounts)
                 driver = login_and_check_account(account)
         popular = check_popularity(driver, following_name)
-        if popular == "next account":
+        if popular == "next":
             account = next(accounts)
             driver = login_and_check_account(account)
             while driver is None:
@@ -370,45 +410,68 @@ def process_account(driver, accounts, start_point,sql_connector, database_tosave
             popular = check_popularity(driver, following_name)
         elif popular != 'next' and popular is not None:
             popular_name, popular_follower, popular_following = popular
-            popular_names.append(popular_name)
-            popular_followers.append(popular_follower)
-            popular_followings.append(popular_following)
-            
             if "These tweets are protected" not in driver.page_source:
-                followers = get_starting_point_followings(driver, popular_name)
-                for follower in followers:
-                    if follower not in visited:
-                        queue.append((follower, depth + 1))
-        if len(popular_names) % 10 == 0:
-            save_to_database(popular_names, popular_followers, popular_followings)
-            popular_names = []
-            popular_followers = []
-            popular_followings = []
-def save_to_database(popular_names, popular_followers, popular_followings):
-    dataframe = pd.DataFrame()
-    dataframe['usernames'] = popular_names
-    dataframe['followers'] = popular_followers
-    dataframe['followings'] = popular_followings
-
+                split_users = get_starting_point_followings_verified_followers(driver, popular_name)
+                while split_users == "next":
+                    account = next(accounts)
+                    driver = login_and_check_account(account)
+                    while driver is None:
+                        account = next(accounts)
+                        driver = login_and_check_account(account)
+                    split_users = get_starting_point_followings_verified_followers(driver, popular_name)
+                split_map[popular_name] = split_users
+                start_data = {"username":popular_name, "followers":popular_follower,"following":popular_following}
+                start_df = pd.DataFrame([start_data])  
+                for split_user in split_users:
+                    if split_user not in visited:
+                        queue.append((split_user, depth + 1))
+                        filtered_users,dataframe = find_common_users(driver,split_map,threshold = 3) 
+                        if split_user == split_users[-1]:
+                            # Using concat to append new data
+                            dataframe = pd.concat([dataframe,start_df], ignore_index=True)
+                        if len(dataframe) > 0:
+                            save_todatabase(dataframe,sql_connector, database_tosave)
+    driver.quit()
+    if filtered_users:
+        return filtered_users
+def save_todatabase(dataframe,sql_connector, database_tosave):
     engine = create_engine(sql_connector)
-    existing_usernames = pd.read_sql(f"SELECT usernames FROM {database_tosave}", engine)
-    dataframe = dataframe[~dataframe['usernames'].isin(existing_usernames['usernames'])]
+    try:
+        existing_usernames = pd.read_sql(f"SELECT username FROM {database_tosave}", engine)
+        dataframe = dataframe[~dataframe['username'].isin(existing_usernames['username'])]
+    except:  
+        pass
     dataframe.to_sql(name = database_tosave, con = engine, index = False, if_exists = 'append')
     engine.dispose()
-#%%
-start_point = "CryptoZhaoX"     
+#%% 
+start_point = "HsakaTrades"
 account_filepath = r"./all_accounts"
-sql_connector = "mysql+mysqlconnector://tangshuo:tangshuo@121.36.100.76:13310/ai_summer"
-database_tosave = "popular_accounts_df"
+sql_connector = "your_database_connector"
+database_tosave = "expanding_kols"
 with open(account_filepath, 'rb') as f:
     all_accounts = pickle.load(f)
 all_accounts = list(all_accounts)[:25]
-accounts = cycle(all_accounts)
-account = next(accounts)
-driver = login_and_check_account(account)
-while driver is None:
+def processing(all_accounts,start_point,sql_connector, database_tosave):
+    accounts = cycle(all_accounts)
     account = next(accounts)
-    email_, username, password, email_password = account
-    driver = login_and_check_account(account) 
-process_account(driver, accounts, start_point, sql_connector, database_tosave)
-driver.close()
+    driver = login_and_check_account(account)
+    while driver is None:
+        account = next(accounts) 
+        driver = login_and_check_account(account) 
+    kols = process_account(driver, accounts, start_point)
+    start_points = [kol for kol in kols if kol != start_point]
+    for continue_start_point in start_points:
+        try:
+            processing(all_accounts,continue_start_point,sql_connector, database_tosave)
+        except:
+            try:
+                driver.quit()
+            except:
+                pass
+            account = next(accounts)
+            driver = login_and_check_account(account)
+            while driver is None:
+                account = next(accounts)
+                driver = login_and_check_account(account)
+            processing(all_accounts,continue_start_point,sql_connector, database_tosave)
+processing(all_accounts,start_point,sql_connector, database_tosave)
